@@ -29,22 +29,7 @@ namespace core.Controllers
         [HttpPost]
         public int Post([FromBody] core.Rapportino rapportino)
         {
-            var a = rapportino;
-            using (var context = new core.SHIFT_MANAGERContext())
-            {
-                try
-                {
-                    context.Rapportino.Add(rapportino);
-                    context.SaveChanges();
-                }
-                catch (System.Exception ex)
-                {
-                    System.Console.WriteLine(ex);
-                }
-
-                var r = context.Rapportino.Include(re=>re.ResocontoLavoro).Include(s=>s.Scontrini).Include(u=>u.Utenti2rapportino).Include(fi=>fi.Firma).FirstOrDefault();
-
-            }
+            
             return 1;
         }
 
