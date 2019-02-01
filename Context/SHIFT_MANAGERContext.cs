@@ -15,8 +15,11 @@ namespace core
         {
         }
 
+        public virtual DbSet<Clienti> Clienti { get; set; }
+        public virtual DbSet<Commesse> Commesse { get; set; }
         public virtual DbSet<Dbg> Dbg { get; set; }
         public virtual DbSet<Firme> Firme { get; set; }
+        public virtual DbSet<Rapportini> Rapportini { get; set; }
         public virtual DbSet<Rapportino> Rapportino { get; set; }
         public virtual DbSet<ResocontoLavoro> ResocontoLavoro { get; set; }
         public virtual DbSet<Scontrini> Scontrini { get; set; }
@@ -34,6 +37,58 @@ namespace core
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<Clienti>(entity =>
+            {
+                entity.HasKey(e => e.ClienteId)
+                    .HasName("PRIMARY");
+
+                entity.ToTable("CLIENTI");
+
+                entity.HasIndex(e => e.Nome)
+                    .HasName("NOME")
+                    .IsUnique();
+
+                entity.Property(e => e.ClienteId)
+                    .HasColumnName("CLIENTE_ID")
+                    .HasColumnType("int(11)");
+
+                entity.Property(e => e.Nome)
+                    .HasColumnName("NOME")
+                    .HasColumnType("varchar(50)");
+            });
+
+            modelBuilder.Entity<Commesse>(entity =>
+            {
+                entity.HasKey(e => e.CommessaId)
+                    .HasName("PRIMARY");
+
+                entity.ToTable("COMMESSE");
+
+                entity.HasIndex(e => e.ClienteId)
+                    .HasName("CLIENTE_ID");
+
+                entity.HasIndex(e => new { e.CommessaId, e.Nome })
+                    .HasName("COMMESSA_ID")
+                    .IsUnique();
+
+                entity.Property(e => e.CommessaId)
+                    .HasColumnName("COMMESSA_ID")
+                    .HasColumnType("int(11)");
+
+                entity.Property(e => e.ClienteId)
+                    .HasColumnName("CLIENTE_ID")
+                    .HasColumnType("int(11)");
+
+                entity.Property(e => e.Nome)
+                    .HasColumnName("NOME")
+                    .HasColumnType("varchar(50)");
+
+                entity.HasOne(d => d.Cliente)
+                    .WithMany(p => p.Commesse)
+                    .HasForeignKey(d => d.ClienteId)
+                    .HasConstraintName("COMMESSE_ibfk_1");
+            });
+
             modelBuilder.Entity<Dbg>(entity =>
             {
                 entity.ToTable("DBG");
@@ -85,12 +140,12 @@ namespace core
                     .HasColumnType("text");
             });
 
-            modelBuilder.Entity<Rapportino>(entity =>
+            modelBuilder.Entity<Rapportini>(entity =>
             {
-                entity.ToTable("RAPPORTINO");
+                entity.HasKey(e => e.RapportinoId)
+                    .HasName("PRIMARY");
 
-                entity.HasIndex(e => e.FirmaId)
-                    .HasName("FIRMA_ID");
+                entity.ToTable("RAPPORTINI");
 
                 entity.Property(e => e.RapportinoId)
                     .HasColumnName("RAPPORTINO_ID")
@@ -101,35 +156,37 @@ namespace core
                     .HasColumnType("bit(1)")
                     .HasDefaultValueSql("'b\\'1\\''");
 
-                entity.Property(e => e.Cliente)
-                    .HasColumnName("CLIENTE")
-                    .HasColumnType("varchar(50)");
-
-                entity.Property(e => e.Commessa)
-                    .HasColumnName("COMMESSA")
+                entity.Property(e => e.Path)
+                    .HasColumnName("PATH")
                     .HasColumnType("varchar(250)");
-
-                entity.Property(e => e.FirmaId)
-                    .HasColumnName("FIRMA_ID")
-                    .HasColumnType("bigint(20)");
-
-                entity.Property(e => e.LavoroEseguito)
-                    .HasColumnName("LAVORO_ESEGUITO")
-                    .HasColumnType("text");
-
-                entity.Property(e => e.Note)
-                    .HasColumnName("NOTE")
-                    .HasColumnType("text");
 
                 entity.Property(e => e.TStamp)
                     .HasColumnName("T_STAMP")
                     .HasColumnType("timestamp")
                     .HasDefaultValueSql("'CURRENT_TIMESTAMP'");
+            });
 
-                entity.HasOne(d => d.Firma)
-                    .WithMany(p => p.Rapportino)
-                    .HasForeignKey(d => d.FirmaId)
-                    .HasConstraintName("RAPPORTINO_ibfk_1");
+            modelBuilder.Entity<Rapportino>(entity =>
+            {
+                entity.ToTable("RAPPORTINO");
+
+                entity.Property(e => e.RapportinoId)
+                    .HasColumnName("RAPPORTINO_ID")
+                    .HasColumnType("bigint(20)");
+
+                entity.Property(e => e.AmINew)
+                    .HasColumnName("AM_I_NEW")
+                    .HasColumnType("bit(1)")
+                    .HasDefaultValueSql("'b\\'1\\''");
+
+                entity.Property(e => e.Path)
+                    .HasColumnName("PATH")
+                    .HasColumnType("varchar(250)");
+
+                entity.Property(e => e.TStamp)
+                    .HasColumnName("T_STAMP")
+                    .HasColumnType("timestamp")
+                    .HasDefaultValueSql("'CURRENT_TIMESTAMP'");
             });
 
             modelBuilder.Entity<ResocontoLavoro>(entity =>
@@ -139,30 +196,33 @@ namespace core
 
                 entity.ToTable("RESOCONTO_LAVORO");
 
-                entity.HasIndex(e => e.IdUtenteKm)
-                    .HasName("ID_UTENTE_KM");
+                entity.HasIndex(e => e.ClienteId)
+                    .HasName("CLIENTE_ID");
 
-                entity.HasIndex(e => e.IdUtenteSpese)
-                    .HasName("ID_UTENTE_SPESE");
+                entity.HasIndex(e => e.CommessaId)
+                    .HasName("COMMESSA_ID");
 
                 entity.HasIndex(e => e.RapportinoId)
                     .HasName("RAPPORTINO_ID");
+
+                entity.HasIndex(e => e.UtenteId)
+                    .HasName("UTENTE_ID");
 
                 entity.Property(e => e.ResocontoId)
                     .HasColumnName("RESOCONTO_ID")
                     .HasColumnType("bigint(20)");
 
+                entity.Property(e => e.ClienteId)
+                    .HasColumnName("CLIENTE_ID")
+                    .HasColumnType("int(11)");
+
+                entity.Property(e => e.CommessaId)
+                    .HasColumnName("COMMESSA_ID")
+                    .HasColumnType("int(11)");
+
                 entity.Property(e => e.DataIntervento)
                     .HasColumnName("DATA_INTERVENTO")
                     .HasColumnType("date");
-
-                entity.Property(e => e.IdUtenteKm)
-                    .HasColumnName("ID_UTENTE_KM")
-                    .HasColumnType("int(11)");
-
-                entity.Property(e => e.IdUtenteSpese)
-                    .HasColumnName("ID_UTENTE_SPESE")
-                    .HasColumnType("int(11)");
 
                 entity.Property(e => e.Km).HasColumnName("KM");
 
@@ -172,24 +232,37 @@ namespace core
 
                 entity.Property(e => e.Spese).HasColumnName("SPESE");
 
+                entity.Property(e => e.TipologiaLavoro)
+                    .HasColumnName("TIPOLOGIA_LAVORO")
+                    .HasColumnType("int(11)");
+
                 entity.Property(e => e.TotaleLavoro).HasColumnName("TOTALE_LAVORO");
 
                 entity.Property(e => e.TotaleViaggio).HasColumnName("TOTALE_VIAGGIO");
 
-                entity.HasOne(d => d.IdUtenteKmNavigation)
-                    .WithMany(p => p.ResocontoLavoroIdUtenteKmNavigation)
-                    .HasForeignKey(d => d.IdUtenteKm)
+                entity.Property(e => e.UtenteId)
+                    .HasColumnName("UTENTE_ID")
+                    .HasColumnType("int(11)");
+
+                entity.HasOne(d => d.Cliente)
+                    .WithMany(p => p.ResocontoLavoro)
+                    .HasForeignKey(d => d.ClienteId)
                     .HasConstraintName("RESOCONTO_LAVORO_ibfk_3");
 
-                entity.HasOne(d => d.IdUtenteSpeseNavigation)
-                    .WithMany(p => p.ResocontoLavoroIdUtenteSpeseNavigation)
-                    .HasForeignKey(d => d.IdUtenteSpese)
-                    .HasConstraintName("RESOCONTO_LAVORO_ibfk_2");
+                entity.HasOne(d => d.Commessa)
+                    .WithMany(p => p.ResocontoLavoro)
+                    .HasForeignKey(d => d.CommessaId)
+                    .HasConstraintName("RESOCONTO_LAVORO_ibfk_4");
 
                 entity.HasOne(d => d.Rapportino)
                     .WithMany(p => p.ResocontoLavoro)
                     .HasForeignKey(d => d.RapportinoId)
                     .HasConstraintName("RESOCONTO_LAVORO_ibfk_1");
+
+                entity.HasOne(d => d.Utente)
+                    .WithMany(p => p.ResocontoLavoro)
+                    .HasForeignKey(d => d.UtenteId)
+                    .HasConstraintName("RESOCONTO_LAVORO_ibfk_2");
             });
 
             modelBuilder.Entity<Scontrini>(entity =>
@@ -227,6 +300,10 @@ namespace core
 
                 entity.ToTable("UTENTI");
 
+                entity.HasIndex(e => new { e.Nome, e.Cognome })
+                    .HasName("NOME")
+                    .IsUnique();
+
                 entity.Property(e => e.UtenteId)
                     .HasColumnName("UTENTE_ID")
                     .HasColumnType("int(11)");
@@ -240,6 +317,11 @@ namespace core
                     .IsRequired()
                     .HasColumnName("NOME")
                     .HasColumnType("varchar(50)");
+
+                entity.Property(e => e.Role)
+                    .HasColumnName("ROLE")
+                    .HasColumnType("int(11)")
+                    .HasDefaultValueSql("'0'");
             });
 
             modelBuilder.Entity<Utenti2rapportino>(entity =>
