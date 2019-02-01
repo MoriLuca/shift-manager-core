@@ -8,7 +8,6 @@ namespace core
         public Rapportino()
         {
             ResocontoLavoro = new HashSet<ResocontoLavoro>();
-            Scontrini = new HashSet<Scontrini>();
             Utenti2rapportino = new HashSet<Utenti2rapportino>();
         }
 
@@ -18,7 +17,6 @@ namespace core
         public bool? AmINew { get; set; }
 
         public virtual ICollection<ResocontoLavoro> ResocontoLavoro { get; set; }
-        public virtual ICollection<Scontrini> Scontrini { get; set; }
         public virtual ICollection<Utenti2rapportino> Utenti2rapportino { get; set; }
     }
 }

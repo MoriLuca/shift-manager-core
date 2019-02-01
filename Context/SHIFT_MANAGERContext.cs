@@ -196,9 +196,6 @@ namespace core
 
                 entity.ToTable("RESOCONTO_LAVORO");
 
-                entity.HasIndex(e => e.ClienteId)
-                    .HasName("CLIENTE_ID");
-
                 entity.HasIndex(e => e.CommessaId)
                     .HasName("COMMESSA_ID");
 
@@ -212,10 +209,6 @@ namespace core
                     .HasColumnName("RESOCONTO_ID")
                     .HasColumnType("bigint(20)");
 
-                entity.Property(e => e.ClienteId)
-                    .HasColumnName("CLIENTE_ID")
-                    .HasColumnType("int(11)");
-
                 entity.Property(e => e.CommessaId)
                     .HasColumnName("COMMESSA_ID")
                     .HasColumnType("int(11)");
@@ -223,6 +216,10 @@ namespace core
                 entity.Property(e => e.DataIntervento)
                     .HasColumnName("DATA_INTERVENTO")
                     .HasColumnType("date");
+
+                entity.Property(e => e.Info)
+                    .HasColumnName("INFO")
+                    .HasColumnType("text");
 
                 entity.Property(e => e.Km).HasColumnName("KM");
 
@@ -244,15 +241,10 @@ namespace core
                     .HasColumnName("UTENTE_ID")
                     .HasColumnType("int(11)");
 
-                entity.HasOne(d => d.Cliente)
-                    .WithMany(p => p.ResocontoLavoro)
-                    .HasForeignKey(d => d.ClienteId)
-                    .HasConstraintName("RESOCONTO_LAVORO_ibfk_3");
-
                 entity.HasOne(d => d.Commessa)
                     .WithMany(p => p.ResocontoLavoro)
                     .HasForeignKey(d => d.CommessaId)
-                    .HasConstraintName("RESOCONTO_LAVORO_ibfk_4");
+                    .HasConstraintName("RESOCONTO_LAVORO_ibfk_3");
 
                 entity.HasOne(d => d.Rapportino)
                     .WithMany(p => p.ResocontoLavoro)
@@ -272,8 +264,8 @@ namespace core
 
                 entity.ToTable("SCONTRINI");
 
-                entity.HasIndex(e => e.RapportinoId)
-                    .HasName("RAPPORTINO_ID");
+                entity.HasIndex(e => e.ResocontoId)
+                    .HasName("RESOCONTO_ID");
 
                 entity.Property(e => e.ScontrinoId)
                     .HasColumnName("SCONTRINO_ID")
@@ -283,13 +275,13 @@ namespace core
                     .HasColumnName("BODY")
                     .HasColumnType("text");
 
-                entity.Property(e => e.RapportinoId)
-                    .HasColumnName("RAPPORTINO_ID")
+                entity.Property(e => e.ResocontoId)
+                    .HasColumnName("RESOCONTO_ID")
                     .HasColumnType("bigint(20)");
 
-                entity.HasOne(d => d.Rapportino)
+                entity.HasOne(d => d.Resoconto)
                     .WithMany(p => p.Scontrini)
-                    .HasForeignKey(d => d.RapportinoId)
+                    .HasForeignKey(d => d.ResocontoId)
                     .HasConstraintName("SCONTRINI_ibfk_1");
             });
 
