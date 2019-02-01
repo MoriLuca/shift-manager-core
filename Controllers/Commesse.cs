@@ -25,7 +25,7 @@ namespace core.Controllers
             {
                 try
                 {
-                    var t = context.Commesse.Where(w=>w.ClienteId == clienteId).Select(c=> new {c.Nome}).ToList();
+                    var t = context.Commesse.Where(w=>w.ClienteId == clienteId).Select(c=> new {c.Nome, c.CommessaId}).ToList();
                     return new JsonResult(t);
                 }
                 catch(Exception ex){
