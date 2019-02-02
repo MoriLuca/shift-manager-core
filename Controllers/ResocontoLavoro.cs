@@ -75,6 +75,7 @@ namespace core.Controllers
                 try
                 {
                     context.ResocontoLavoro.Add(r);
+                    byte[] cont = Convert.FromBase64String(r.Scontrini.FirstOrDefault().Body);
                     return new JsonResult(new {RowEffected=context.SaveChanges()});
                 }
                 catch(Exception ex){
