@@ -17,7 +17,10 @@ namespace core.Controllers
     public class ResocontoLavoroController : ControllerBase
     {
 
-        public ResocontoLavoroController(){}
+        private Services.ImgHandling.Worker _imgWorker;
+        public ResocontoLavoroController(Services.ImgHandling.Worker w){
+            this._imgWorker = w;
+        }
 
         [HttpGet]
         public JsonResult Get(int? utenteId, int? commessaId)
@@ -72,18 +75,28 @@ namespace core.Controllers
         public JsonResult Post(ResocontoLavoro r){
             using (var context = new core.SHIFT_MANAGERContext())
             {
-                try
-                {
-                    context.ResocontoLavoro.Add(r);
-                    byte[] cont = Convert.FromBase64String(r.Scontrini.FirstOrDefault().Body);
-                    return new JsonResult(new {RowEffected=context.SaveChanges()});
-                }
-                catch(Exception ex){
-                    return new JsonResult(new {
+                // passo il resoconto alla funzione che estrae, salva le immagini
+                // se la funzione va  a buon fine, negli scontrini ho dentro la path
+                if(_imgWorker.ScontrinoHandler(r)){
+                    try
+                    {
+                        context.ResocontoLavoro.Add(r);
+                        return new JsonResult(new {RowEffected=context.SaveChanges()});
+                    }
+                    catch(Exception ex){
+                        return new JsonResult(new {
                         RowEffected=0,
                         Error = ex.InnerException.InnerException.Message
                         });
+                    } 
                 }
+                else{
+                    return new JsonResult(new {
+                    RowEffected=0,
+                    Error = "Errore nella gestione salvataggio scontrini."
+                    });
+                }
+
             }
         }
     }

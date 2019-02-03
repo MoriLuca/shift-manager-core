@@ -40,6 +40,7 @@ namespace core
             ));            
             services.AddSingleton<Services.Db.Users>();
             services.AddSingleton<Services.Email.Sender>();
+            services.AddSingleton<Services.ImgHandling.Worker>();
             services.AddCors();
         }
 
