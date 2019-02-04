@@ -58,15 +58,17 @@ namespace Services.ImgHandling
                     string path = @"/home/luca/scontrini/";
                     path += $@"{nomeCliente}/{nomeCommessa}/{anno}/{mese}/";
                     string fileName = $@"[{giorno}]{nomeUtente.Nome}_{nomeUtente.Cognome}";
+                    
                     //ricerca file esistenti per lo stesso giorno
-
                     if (!System.IO.Directory.Exists(path)){
                         System.IO.Directory.CreateDirectory(path);
                     }
                     else{
+                        //se la path esiste, conto se esistono scontrini con giorno e nome utente uguali,
+                        //se dovessero esiste sommo al numero di socntrino per il salvataggio
                         numeroScontrino += System.IO.Directory.GetFiles(path).Count(n=>n.Contains(fileName));
                     }
-
+                    //aggiungo al nome del file il numero dello scontrino
                     fileName += $"#{numeroScontrino}";
 
                     string fullPath = path + fileName + ext;

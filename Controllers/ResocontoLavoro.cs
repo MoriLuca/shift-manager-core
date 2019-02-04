@@ -30,7 +30,7 @@ namespace core.Controllers
                 {
                     try
                     {
-                        var t = context.ResocontoLavoro.Where(w=>w.UtenteId == utenteId && w.CommessaId == commessaId).ToList();
+                        var t = context.ResocontoLavoro.Where(w=>w.UtenteId == utenteId && w.CommessaId == commessaId).OrderByDescending(i=>i.DataIntervento).ToList();
                         return new JsonResult(t);
                     }
                     catch(Exception ex){
@@ -84,6 +84,7 @@ namespace core.Controllers
                         return new JsonResult(new {RowEffected=context.SaveChanges()});
                     }
                     catch(Exception ex){
+                        Trace.WriteLine("Errore nel salvataggio database del resoconto lavori"+ex.Message);
                         return new JsonResult(new {
                         RowEffected=0,
                         Error = ex.InnerException.InnerException.Message
