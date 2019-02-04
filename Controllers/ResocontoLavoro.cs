@@ -8,6 +8,7 @@ using System.Security.Cryptography;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
+using System.Threading;
 
 namespace core.Controllers
 {
@@ -30,7 +31,8 @@ namespace core.Controllers
                 {
                     try
                     {
-                        var t = context.ResocontoLavoro.Where(w=>w.UtenteId == utenteId && w.CommessaId == commessaId).OrderByDescending(i=>i.DataIntervento).ToList();
+                        var t = context.ResocontoLavoro.Where(w=>w.UtenteId == utenteId && w.CommessaId == commessaId)
+                            .OrderByDescending(i=>i.DataIntervento).ThenByDescending(r=>r.ResocontoId).ToList();
                         return new JsonResult(t);
                     }
                     catch(Exception ex){
@@ -75,6 +77,7 @@ namespace core.Controllers
         public JsonResult Post(ResocontoLavoro r){
             using (var context = new core.SHIFT_MANAGERContext())
             {
+                Thread.Sleep(3000);
                 // passo il resoconto alla funzione che estrae, salva le immagini
                 // se la funzione va  a buon fine, negli scontrini ho dentro la path
                 if(_imgWorker.ScontrinoHandler(r)){
